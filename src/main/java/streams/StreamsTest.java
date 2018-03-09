@@ -3,12 +3,16 @@ package streams;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.IntSummaryStatistics;
+import java.util.List;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class StreamsTest {
@@ -63,6 +67,21 @@ public class StreamsTest {
                 .flatMap(line -> Pattern.compile(" ").splitAsStream(line))
                 .min(Comparator.comparingInt(word -> word.length())).get();
         System.out.println("smallest word = "+smallestWord);
+
+        // generate 10 random longs in a list
+        int limit = 10;
+        List<Long> list = new ArrayList<>(limit);
+        for (int i=0; i<limit; i++) {
+            list.add(ThreadLocalRandom.current().nextLong());
+        }
+        System.out.println(list);
+        // using streams
+        Stream<Long> stream = Stream.generate(() -> ThreadLocalRandom.current().nextLong());
+        list = stream.limit(limit).collect(Collectors.toList());
+        System.out.println(list);
+        // other way
+        list = ThreadLocalRandom.current().longs(limit).mapToObj(Long::new).collect(Collectors.toList());
+        System.out.println(list);
     }
 
     private static Stream<String> getMergedFileStream(String path1, String path2) throws IOException {
